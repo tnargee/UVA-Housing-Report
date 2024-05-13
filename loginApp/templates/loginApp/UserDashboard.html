@@ -1,0 +1,241 @@
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        header, .footer-bar {
+            background-color: #fff;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .main-content {
+            flex: 1;
+            padding: 1rem;
+            margin: 2rem auto;
+            max-width: 960px;
+            text-align: center;
+        }
+        .profile-card {
+            position: relative; /* Set position to relative */
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            margin-right: 1rem;
+            height: 325px;
+            width: 325px;
+        }
+        .profile-card:last-child {
+            margin-right: 0; /* Remove margin from the last card to prevent overflow */
+        }
+        .file-container {
+            height: 100px; /* Fixed height for the file container */
+            overflow-y: auto; /* Enable vertical scrolling if content exceeds the container height */
+            padding: 0 1rem; /* Add some padding to the container */
+        }
+
+        .profile-card img {
+            border-radius: 50%; /* Circular image */
+            width: 100px; /* Fixed image width */
+            height: 100px; /* Fixed image height */
+            margin: 0 auto; /* Center the image */
+        }
+        .profile-card h2 {
+            font-size: 1.0rem; /* Name font size */
+        }
+        .profile-card p {
+            font-size: 1rem; /* Email and role font size */
+            color: #333; /* Text color */
+        }
+        .dashboard-header {
+            border-bottom: 4px solid #0056b3;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .dashboard-header img {
+            margin-top: 1rem;
+        }
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+            color: #0056b3;
+            font-weight: 500;
+            margin: 0.5rem 0;
+        }
+        .btn-edit, .btn-delete {
+            display: inline-block; /* Align buttons side by side */
+            padding: 0.5rem 1rem; /* consistent padding for both buttons */
+            color: white; /* white text for visibility */
+            border: none; /* no border */
+            font-size: 1rem; /* standard font size for readability */
+            line-height: 1.5; /* standard line height for better text alignment */
+            text-align: center; /* center the text inside buttons */
+            vertical-align: middle; /* align buttons vertically */
+            cursor: pointer; /* change cursor to pointer on hover */
+            margin-right: 0.5rem; /* margin to the right of the buttons */
+            text-decoration: none; /* remove underline from links */
+        }
+
+        /* Specific style for the Edit button */
+        .btn-edit {
+            background-color: #007bff; /* Bootstrap primary blue for Edit */
+            width: 90px; /* fixed width to match Delete button */
+        }
+
+        /* Specific style for the Delete button */
+        .btn-delete {
+            background-color: #dc3545; /* Bootstrap danger red for Delete */
+            width: 90px; /* fixed width to match Edit button */
+        }
+
+        .btn, .btn-sm {
+            border-radius: 0.5rem;
+            transition: background-color 0.3s ease;
+        }
+        .button-group {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex; /* Set display to flex */
+            justify-content: center; /* Center the buttons horizontally */
+            align-items: center; /* Center the buttons vertically */
+        }
+        .navbar.fixed-bottom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #394451;
+            color: #ffffff;
+            padding: 1rem 0;
+            width: 100%;
+            font-size: 1rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            text-align: center;
+        }
+
+        .navbar.fixed-bottom a {
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .navbar.fixed-bottom a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .profile-card {
+                flex-basis: 100%; /* Cards will take full width on smaller screens */
+                margin-right: 0; /* No margin between cards on smaller screens */
+            }
+        }
+        .btn-header {
+            position: absolute;
+            top: 50%; /* Position at the middle vertically */
+            right: .2rem; /* Adjust as needed for right-hand corner */
+            transform: translateY(-50%); /* Move it up by half its height */
+            background-color: #0056b3;
+            color: #ffffff;
+        }
+        .welcome-message {
+            position: relative;
+        }
+
+    </style>
+</head>
+<body>
+<header>
+    <div class="welcome-message">
+        Welcome, {{ user.username|capfirst }}! This is your User Dashboard - You are logged in as a Regular User.
+        <a href="/forum" class="btn btn-header">Go to Community Forum</a>
+    </div>
+</header>
+<div class="main-content">
+    <div class="dashboard-header">
+        <img src="{% static 'society.png' %}" alt="Rotunda Image" width="100" height="60">
+        <h1>Complaints You Have Submitted</h1>
+    </div>
+    <div style="margin: 2rem;">
+        <a href="{% url 'complaint_form' %}" class="btn btn-primary">File a Complaint</a>
+        <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+    </div>
+    <div class="card-container" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+        {% for complaint in complaints %}
+            <div class="profile-card">
+                <h2>{{ complaint.name }}</h2>
+                <p>Location: {{ complaint.location }}</p>
+                <p>{{ complaint.description }}</p>
+                <p>Status: {{ complaint.get_status_display }}</p>
+                {% if complaint.review %}
+                    <p>Review: {{ complaint.review }}</p>
+                {% endif %}
+
+                {% if complaint.files_info %}
+                    <div class="file-container">
+                        {% if complaint.files_info|length == 1 %}
+                            {% with file=complaint.files_info.first %}
+                                {% if file.is_image %}
+                                    <img src="{{ file.file.url }}" alt="Image preview" class="img-fluid">
+                                {% elif file.is_pdf %}
+                                    <iframe src="{{ file.file.url }}" width="100%" height="200"></iframe>
+                                {% elif file.is_text %}
+                                    <div class="text-file-content">
+                                        <a href="{{ file.file.url }}" target="_blank">View Text File</a>
+                                    </div>
+                                {% else %}
+                                    <a href="{{ file.file.url }}" target="_blank">Download File</a>
+                                {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            <p>Files:</p>
+                            <ul>
+                                {% for file in complaint.files_info %}
+                                    <li><a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="button-group">
+                    <form method="post" action="{% url 'delete_complaint' complaint.id %}" class="mt-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-delete btn-sm">Delete</button>
+                    </form>
+                    <a href="{% url 'edit_complaint' complaint.id %}" class="btn btn-edit btn-sm">Edit</a>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center">
+                <p>You have not submitted any complaints.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="navbar fixed-bottom">
+    <span>This system is a class project and is not monitored. Do not submit real information. For more information, visit our project page at <a href="https://s24.cs3240.org/project.html" target="_blank">s24.cs3240.org/project.html</a>.</span>
+</div>
+</body>
+</html>

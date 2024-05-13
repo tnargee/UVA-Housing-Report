@@ -1,0 +1,129 @@
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit an Anonymous Complaint</title>
+     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet">
+    <style>
+       body {
+            background: #e9e9e9;
+            color: #bcbcbc; /* This is equivalent to lighten(#000000, 40%) */
+            font-family: 'RobotoDraft', 'Roboto', sans-serif;
+            font-size: 14px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+         .container {
+        position: relative;
+        max-width: 700px; /* Adjusted from 460px to 700px for a wider form */
+        width: 90%; /* This will make the container take up 90% of the viewport width */
+        margin: 20px auto 100px; /* Reduced bottom margin */
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 5px;
+        padding: 20px; /* Uniform padding */
+        box-sizing: border-box;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        transition: .3s ease;
+    }
+/* Adjust the height of the textarea */
+.textarea#id_description {
+    height: 320px; /* Increased height */
+    resize: vertical; /* Allow vertical resizing */
+}
+
+        .title {
+            border-left: 5px solid #394451;
+            margin: 0 0 35px;
+            padding: 10px 0 10px 10px;
+            color: #394451;
+            font-size: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        header {
+            background-color: #ffffff; /* White background for the header */
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1); /* A subtle shadow for depth */
+        }
+        .welcome-message {
+            margin: 0;
+            font-size: 1.2rem; /* Larger font size for welcome message */
+            color: #333; /* Darker text color for contrast */
+        }
+        .navbar.fixed-bottom {
+    display: flex;
+    justify-content: center; /* Horizontally center the content */
+    align-items: center; /* Vertically center the content */
+    background-color: #394451; /* Dark blue-ish gray color */
+    color: #ffffff; /* White text color for contrast */
+    padding: 1rem 0;
+    width: 100%;
+    font-size: 1rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    text-align: center;
+}
+
+.navbar.fixed-bottom a {
+    color: #ffffff; /* White text color for links for better visibility */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar.fixed-bottom a:hover {
+    text-decoration: underline; /* Underline on hover for links */
+}
+        /* Adjust the height of the textarea */
+        textarea#id_description {
+            height: 160px; /* Adjust the height as needed */
+            resize: vertical; /* Allow vertical resizing */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="welcome-message">
+            Welcome! You are submitting this complaint as an anonymous user.
+            <a href="/">Back to Home</a>.
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h1 class="title">Submit an Anonymous Complaint</h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div class="form-group">
+                    <label for="upload">Upload Files (you can select multiple files):</label>
+                    <input type="file" class="form-control" id="upload" name="upload" multiple>
+                </div>
+                <div class="button-container">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="navbar fixed-bottom">
+        <span>This system is a class project and is not monitored. Do not submit real information.
+        For more information, visit our project page at
+        <a href="https://s24.cs3240.org/project.html" target="_blank">s24.cs3240.org/project.html</a>.</span>
+    </div>
+
+    {% bootstrap_javascript %}
+</body>
+</html>

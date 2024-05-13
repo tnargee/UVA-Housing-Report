@@ -1,0 +1,276 @@
+{% load static %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* Existing styles for font, card, button, etc. */
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: navy;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; /* A light grey background */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensures the body takes at least the viewport height */
+        }
+        header {
+            display: flex; /* Enables flexbox layout */
+            justify-content: space-between; /* Space between the welcome message and the logout button */
+            align-items: center; /* Vertically center aligns the items */
+            background-color: #fff; /* White background for the header */
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1); /* A subtle shadow for depth */
+        }
+        .welcome-message {
+            margin: 0;
+            padding: 0 1rem; /* Padding for the welcome message */
+            font-size: 1.2rem; /* Larger font size for welcome message */
+            color: #333; /* Darker text color for contrast */
+        }
+        .container {
+            flex: 1; /* Flex grow to take available space */
+            margin: 2rem auto;
+            max-width: 960px; /* Wider container for better layout on desktop */
+            padding: 0 1rem;
+        }
+        .card {
+            margin-bottom: 2rem; /* Increased spacing between cards */
+            border: none; /* Removing border */
+            box-shadow: 0 2px 4px rgba(0,0,0,.1); /* Adding shadow to cards for depth */
+        }
+        .card-body {
+            padding: 2rem; /* More padding within cards */
+        }
+        .card-title, .card-subtitle, .card-text {
+            margin-bottom: 1rem; /* Uniform margin-bottom */
+        }
+        .btn {
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem; /* Larger buttons */
+            border-radius: 0.5rem; /* Rounded corners for buttons */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0.25rem; /* Spacing around buttons */
+        }
+        .btn-sm {
+            font-size: 0.8rem; /* Smaller font size for buttons */
+            padding: 0.7rem 1.4rem; /* Reduced padding for smaller buttons */
+            margin: 0.25rem; /* Keeps spacing around buttons */
+        }
+        .button-group {
+            display: flex;
+            justify-content: start; /* Align buttons to the start of the container */
+            gap: 0.25rem; /* Space between buttons */
+        }
+        h2 {
+            border-bottom: 2px solid #ccc; /* Light gray bottom border */
+            padding-bottom: 10px; /* Padding below the text to space out the border */
+            margin-bottom: 20px; /* Additional space below the border */
+        }
+        .logout-button {
+            padding: 0.5rem 1rem; /* Smaller padding for the button */
+            background-color: #dc3545; /* Bootstrap's .btn-danger background color */
+            color: white; /* Text color */
+            text-decoration: none; /* Removes underline from links */
+            border-radius: 0.25rem; /* Rounded borders */
+            transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+        }
+        .logout-button:hover {
+            background-color: #c82333; /* Darker shade on hover, similar to Bootstrap's .btn-danger:hover */
+        }
+        .footer {
+            width: 100%; /* Full width */
+            background-color: #f0f0f0; /* Light gray background */
+            padding: 1rem; /* Padding around text */
+            text-align: center; /* Center-align text */
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1); /* Subtle shadow above the footer */
+            margin-top: auto; /* Pushes the footer to the bottom */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="welcome-message">
+            Welcome, {{ user.username|capfirst }}! You're an admin user
+        </div>
+        <a href="{% url 'logout' %}" class="logout-button">Logout</a>
+    </header>
+
+    <div class="container mt-4">
+        <!-- Section for Not Reviewed complaints -->
+        <h2>Not Reviewed Complaints</h2>
+        <div class="row">
+            {% for complaint in complaints %}
+            {% if complaint.status == "notreviewed" %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Name: {{ complaint.name }}</h5>
+                        <p class="card-text">Location: {{ complaint.location }}</p>
+                        <p class="card-text">Description: {{ complaint.description }}</p>
+                        <p>Status: {{ complaint.status }}</p>
+                        {% if complaint.review %}
+                        <p>Review: {{ complaint.review }}</p>
+                        {% endif %}
+                        <!-- File handling logic -->
+                        {% if complaint.files_info %}
+                        <div class="file-container">
+                            {% for file in complaint.files_info %}
+                            {% if file.is_image %}
+                            <h6>Image Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if file.is_pdf %}
+                            <h6>PDF Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if file.is_text %}
+                            <h6>Text Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if not file.is_image and not file.is_pdf and not file.is_text %}
+                            <h6>Other Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'complaints' complaint.id %}" class="btn btn-primary btn-sm mt-2">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <p class="col">No complaints in this category yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Section for In Progress complaints -->
+        <h2>In Progress Complaints</h2>
+        <div class="row">
+            {% for complaint in complaints %}
+            {% if complaint.status == "in_progress" %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Name: {{ complaint.name }}</h5>
+                        <p class="card-text">Location: {{ complaint.location }}</p>
+                        <p class="card-text">Description: {{ complaint.description }}</p>
+                        <div>
+                 asd       <p>Status: {{ complaint.status }}</p>
+                        </div>
+                        {% if complaint.review %}
+                        <div>
+                        <p>Review: {{ complaint.review }}</p>
+                        </div>
+                        {% endif %}
+                        {% if complaint.files_info %}
+                        <div class="file-container">
+                            {% for file in complaint.files_info %}
+                            {% if file.is_image %}
+                            <h6>Image Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if file.is_pdf %}
+                            <h6>PDF Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if file.is_text %}
+                            <h6>Text Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if not file.is_image and not file.is_pdf and not file.is_text %}
+                            <h6>Other Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'complaints' complaint.id %}" class="btn btn-primary btn-sm mt-2">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <p class="col">No complaints in this category yet.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Section for Reviewed complaints -->
+        <h2>Reviewed Complaints</h2>
+        <div class="row">
+            {% for complaint in complaints %}
+            {% if complaint.status == "reviewed" %}
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Name: {{ complaint.name }}</h5>
+                        <p class="card-text">Location: {{ complaint.location }}</p>
+                        <p class="card-text">Description: {{ complaint.description }}</p>
+                        <p>Status: {{ complaint.status }}<p>
+                        {% if complaint.review %}
+                        <p>Review: {{ complaint.review }}</p>
+                        {% endif %}
+                        {% if complaint.files_info %}
+                        <div class="file-container">
+                            {% for file in complaint.files_info %}
+                            {% if file.is_image %}
+                            <h6>Image Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if file.is_pdf %}
+                            <h6>PDF Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if file.is_text %}
+                            <h6>Text Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                            {% for file in complaint.files_info %}
+                            {% if not file.is_image and not file.is_pdf and not file.is_text %}
+                            <h6>Other Files:</h6>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.file.name }}</a>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'complaints' complaint.id %}" class="btn btn-primary btn-sm mt-2">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <p class="col">No complaints in this category yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="footer">
+        <span>This system is a class project and is not monitored. Do not submit real information. For more information, visit our project page at <a href="https://s24.cs3240.org/project.html" target="_blank">s24.cs3240.org/project.html</a>.</span>
+    </div>
+</body>
+</html>
